@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Image Question";
+}
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+</style>
+<div class="card shadow-lg p-4 mx-auto" style="max-width: 600px; border-radius: 15px;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary mb-3">Describe the Picture</h2>
+        <img id="questionImage"
+             src=""
+             alt="Question Image"
+             class="img-fluid rounded shadow-sm"
+             style="max-height: 250px; object-fit: cover;" />
+    </div>
+
+    <form id="answerForm">
+        <div class="mb-3">
+            <label for="answer-input" class="form-label fw-semibold">
+                Enter Your Answer:
+            </label>
+            <input type="text" id="answer-input" name="answer"
+                   class="form-control" placeholder="Write something about the picture..." required />
+        </div>
+
+        <div class="text-center mb-2">
+            <button type="submit" class="btn btn-primary px-5 py-2">
+                Submit
+            </button>
+            <button type="button" id="next-button" class="btn btn-secondary px-4 py-2" disabled>
+                Next ->
+            </button>
+
+        </div>
+    </form>
+
+    <div id="resultMessage" class="text-center mt-3 fw-bold"></div>
+    <button name="Logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+    let currentSolution = null;
+
+    function logout(){
+        const response = fetch("https://localhost:7197/Home/Logout");
+    }
+
+    // Fetch question from API
+    async function loadQuestion() {
+        try {
+            const response = await fetch("https://marcconrad.com/uob/banana/api.php"); // Use HTTPS to avoid mixed content
+            const data = await response.json();
+
+            // Set image
+            document.getElementById("questionImage").src = data.question;
+
+            // Store the solution
+            currentSolution = data.solution;
+
+            // Reset form
+            document.getElementById("answer-input").value = "";
+            document.getElementById("resultMessage").textContent = "";
+            document.getElementById("next-button").disabled = true;
+
+        } catch (error) {
+            console.error("Error fetching question:", error);
+            document.getElementById("resultMessage").textContent = "Failed to load question.";
+        }
+    }
+
+    // Run on page load
+    window.onload = loadQuestion;
+
+    // Handle form submission
+    document.getElementById("answerForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const userAnswer = document.getElementById("answer-input").value.trim();
+        const resultMessage = document.getElementById("resultMessage");
+        const nextButton = document.getElementById("next-button");
+
+        // Check answer
+        if (parseInt(userAnswer) === currentSolution) {
+            resultMessage.textContent = "Correct!";
+            resultMessage.classList.remove("text-danger");
+            resultMessage.classList.add("text-success");
+        } else {
+            resultMessage.textContent = "Incorrect!";
+            resultMessage.classList.remove("text-success");
+            resultMessage.classList.add("text-danger");
+        }
+
+        // Enable Next button after answer is checked
+        nextButton.disabled = false;
+    });
+
+    // Handle Next button click
+    document.getElementById("next-button").addEventListener("click", function() {
+        loadQuestion(); // Load new question
+    });
+</script>
