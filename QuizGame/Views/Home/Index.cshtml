@@ -2,15 +2,6 @@
     ViewData["Title"] = "Image Question";
 }
 <style>
-    .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-        .card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
     .btn-primary:hover {
         background-color: #0056b3;
     }
@@ -75,7 +66,6 @@
             // Reset form
             document.getElementById("answer-input").value = "";
             document.getElementById("resultMessage").textContent = "";
-            document.getElementById("next-button").disabled = true;
 
         } catch (error) {
             console.error("Error fetching question:", error);
@@ -92,7 +82,6 @@
 
         const userAnswer = document.getElementById("answer-input").value.trim();
         const resultMessage = document.getElementById("resultMessage");
-        const nextButton = document.getElementById("next-button");
 
         // Check answer
         if (parseInt(userAnswer) === currentSolution) {
@@ -108,8 +97,4 @@
 
     });
 
-    // Handle Next button click
-    document.getElementById("next-button").addEventListener("click", function() {
-         // Load new question
-    });
 </script>
