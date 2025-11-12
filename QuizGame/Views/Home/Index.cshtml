@@ -39,9 +39,9 @@
             <button type="submit" class="btn btn-primary px-5 py-2">
                 Submit
             </button>
-            <button type="button" id="next-button" class="btn btn-secondary px-4 py-2" disabled>
+           @*  <button type="button" id="next-button" class="btn btn-secondary px-4 py-2" disabled>
                 Next ->
-            </button>
+            </button> *@
 
         </div>
     </form>
@@ -55,7 +55,9 @@
     let currentSolution = null;
 
     function logout(){
-        const response = fetch("https://localhost:7197/Home/Logout");
+          const response = fetch('/Account/Logout')
+    .then(() => window.location.href = '/Account/Login');
+
     }
 
     // Fetch question from API
@@ -97,18 +99,17 @@
             resultMessage.textContent = "Correct!";
             resultMessage.classList.remove("text-danger");
             resultMessage.classList.add("text-success");
+            loadQuestion();
         } else {
             resultMessage.textContent = "Incorrect!";
             resultMessage.classList.remove("text-success");
             resultMessage.classList.add("text-danger");
         }
 
-        // Enable Next button after answer is checked
-        nextButton.disabled = false;
     });
 
     // Handle Next button click
     document.getElementById("next-button").addEventListener("click", function() {
-        loadQuestion(); // Load new question
+         // Load new question
     });
 </script>
