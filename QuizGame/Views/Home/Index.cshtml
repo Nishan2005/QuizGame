@@ -1,15 +1,64 @@
 ﻿@{
     ViewData["Title"] = "Image Question";
+    var username = ViewData["Username"];
 }
+
 <style>
-    .btn-primary:hover {
-        background-color: #0056b3;
+    .top-bar {
+        background-color: #F5F5DC;
+        color: #CFB53B;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        margin-bottom: 20px;
     }
 
+        .top-bar .user-info {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .top-bar .score {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+    h2 {
+        font-family: 'Poppins', 'Segoe UI', sans-serif;
+        color: #CFB53B; /* Blue shade */
+        font-weight: 700; /* Bold */
+        letter-spacing: 1px;
+        text-transform: uppercase; /* Optional: makes text all caps */
+    }
+
+
+    .btn-logout {
+        background-color: #C19A6B;
+        border: none;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-logout:hover {
+            background-color: #C19A6B;
+        }
+
+    
 </style>
+
+<div class="top-bar shadow-sm">
+    <div class="user-info">Welcome, @username!</div>
+    <div class="score">Score: <span id="scoreValue">0</span></div>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+</div>
+
 <div class="card shadow-lg p-4 mx-auto" style="max-width: 600px; border-radius: 15px;">
     <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary mb-3">Describe the Picture</h2>
+        <h2 class="mb-3">FIND THE MISSING NUMBER.</h2>
         <img id="questionImage"
              src=""
              alt="Question Image"
@@ -22,79 +71,97 @@
             <label for="answer-input" class="form-label fw-semibold">
                 Enter Your Answer:
             </label>
-            <input type="text" id="answer-input" name="answer"
-                   class="form-control" placeholder="Write something about the picture..." required />
+            <input type="number" id="answer-input" name="answer"
+                   class="form-control" placeholder="Write according to the Picture..." required />
         </div>
 
         <div class="text-center mb-2">
             <button type="submit" class="btn btn-primary px-5 py-2">
                 Submit
             </button>
-           @*  <button type="button" id="next-button" class="btn btn-secondary px-4 py-2" disabled>
-                Next ->
-            </button> *@
-
         </div>
     </form>
 
     <div id="resultMessage" class="text-center mt-3 fw-bold"></div>
-    <button name="Logout" onclick="logout()">Logout</button>
-
 </div>
 
 <script>
     let currentSolution = null;
+    let score = 0;
 
-    function logout(){
-          const response = fetch('/Home/Logout')
-    .then(() => window.location.href = '/Account/Login');
-
+    async function logout() {
+        await fetch('/Home/Logout');
+        window.location.href = '/Account/Login';
     }
 
-    // Fetch question from API
+    // Load new question
     async function loadQuestion() {
         try {
-            const response = await fetch("https://marcconrad.com/uob/banana/api.php"); // Use HTTPS to avoid mixed content
+            const response = await fetch("https://marcconrad.com/uob/banana/api.php");
             const data = await response.json();
 
-            // Set image
             document.getElementById("questionImage").src = data.question;
-
-            // Store the solution
             currentSolution = data.solution;
-
-            // Reset form
             document.getElementById("answer-input").value = "";
             document.getElementById("resultMessage").textContent = "";
+        } catch (error) {
+            console.error("Error fetching question:", error);
+            document.getElementById("resultMessage").textContent = "Failed to load question.";
+        }
+    }
+    async function addScore() {
+        try {
+            const response = await fetch('/Home/PlusScore');
+            if(response){
+               await loadScore();
+            }
 
         } catch (error) {
             console.error("Error fetching question:", error);
             document.getElementById("resultMessage").textContent = "Failed to load question.";
         }
     }
+    async function loadScore() {
+        try {
+            const response = await fetch('/Home/GetScore');
+            const data = await response.json(); // ✅ add await
 
-    // Run on page load
-    window.onload = loadQuestion;
+            console.log(data); // Optional: to check what you’re getting
+            document.getElementById("scoreValue").textContent = data.yourScore;
+        } catch (error) {
+            console.error("Error fetching score:", error);
+            document.getElementById("resultMessage").textContent = "Failed to load score.";
+        }
+    }
 
-    // Handle form submission
-    document.getElementById("answerForm").addEventListener("submit", function(e) {
+
+    window.onload = async () => {
+        await loadQuestion();
+        await loadScore();
+    };
+
+    // Form submission
+    document.getElementById("answerForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
         const userAnswer = document.getElementById("answer-input").value.trim();
         const resultMessage = document.getElementById("resultMessage");
 
-        // Check answer
         if (parseInt(userAnswer) === currentSolution) {
-            resultMessage.textContent = "Correct!";
+            resultMessage.textContent = "✅ Correct!";
             resultMessage.classList.remove("text-danger");
             resultMessage.classList.add("text-success");
+
+            // increase score
+            addScore();
+            document.getElementById("scoreValue").textContent = score;
+
+            // load next question
             loadQuestion();
         } else {
-            resultMessage.textContent = "Incorrect!";
+            resultMessage.textContent = "❌ Incorrect!";
             resultMessage.classList.remove("text-success");
             resultMessage.classList.add("text-danger");
         }
-
     });
-
 </script>

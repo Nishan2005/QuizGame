@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QuizGame.DbContext;
 using QuizGame.Models;
 using System.Diagnostics;
 
@@ -12,10 +13,12 @@ namespace QuizGame.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUserService _userService;
-        public HomeController(ILogger<HomeController> logger, IUserService userService)
+        private readonly ApplicationDbContext _context;
+        public HomeController(ILogger<HomeController> logger, IUserService userService, ApplicationDbContext context)
         {
             _logger = logger;
             _userService = userService;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -41,19 +44,51 @@ namespace QuizGame.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        public bool SubmitAnswer()
+        [HttpGet]
+        public IActionResult GetScore()
         {
-            
-            return false;
+            var user = _userService.GetCurrentUser();
+            var getScore = _context.Scores.FirstOrDefault(s => s.UserId.ToString() == user.UserId);
+            if (getScore != null)
+            {
+                return Ok(new { YourScore = getScore.TotalScore });
+            }
+            return Ok(new { YourScore = 0 });
         }
-        [HttpPost]
-        public IActionResult CheckAnswer([FromBody] AnswerModel model)
+        
+        [HttpGet]
+        public IActionResult PlusScore()
         {
-            string correctAnswer = "dog"; // You can change this or fetch dynamically
+            try
+            {
+                var user = _userService.GetCurrentUser();
 
-            bool isCorrect = model.Answer?.Trim().ToLower() == correctAnswer.ToLower();
+                var getScore = _context.Scores.FirstOrDefault(s => s.UserId.ToString() == user.UserId);
+                if (getScore != null)
+                {
+                    getScore.TotalScore++;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    var createNew = _context.Scores.Add(new Score
+                    {
+                        UserId = int.Parse(user.UserId),
+                        TotalScore = 1
+                    });
+                    _context.SaveChanges();
 
-            return Json(new { isCorrect });
+                }
+                return Ok(true);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating score");
+                return BadRequest(false);
+
+            }
+
         }
 
         public class AnswerModel

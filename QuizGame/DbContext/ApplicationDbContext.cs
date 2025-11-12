@@ -12,5 +12,6 @@ namespace QuizGame.DbContext
         {
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<Score> Scores { get; set; }
     }
 }

@@ -18,5 +18,38 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    overflow: hidden;
 }
+a {
+    color: #CFB53B;
+}
+h4 {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    color: #CFB53B; 
+    font-weight: 700; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.btn-primary {
+    background-color: #C3B091 !important;
+    border: none !important;
+    color: white !important;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    .btn-primary:hover {
+        background-color: #C19A6B !important;
+        color: white !important;
+    }
+
+    .btn-primary:focus,
+    .btn-primary:active,
+    .btn-primary:focus:active {
+        background-color: #A67C52 !important; /* darker shade for pressed state */
+        border: none !important;
+        color: white !important;
+        box-shadow: none !important; /* removes blue glow */
+        outline: none !important;
+    }
