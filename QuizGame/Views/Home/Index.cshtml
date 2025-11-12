@@ -26,10 +26,10 @@
 
     h2 {
         font-family: 'Poppins', 'Segoe UI', sans-serif;
-        color: #CFB53B; /* Blue shade */
-        font-weight: 700; /* Bold */
+        color: #CFB53B; 
+        font-weight: 700; 
         letter-spacing: 1px;
-        text-transform: uppercase; /* Optional: makes text all caps */
+        text-transform: uppercase; 
     }
 
 
@@ -124,9 +124,9 @@
     async function loadScore() {
         try {
             const response = await fetch('/Home/GetScore');
-            const data = await response.json(); // ✅ add await
+            const data = await response.json(); 
 
-            console.log(data); // Optional: to check what you’re getting
+            console.log(data); 
             document.getElementById("scoreValue").textContent = data.yourScore;
         } catch (error) {
             console.error("Error fetching score:", error);
@@ -152,11 +152,11 @@
             resultMessage.classList.remove("text-danger");
             resultMessage.classList.add("text-success");
 
-            // increase score
+            
             addScore();
             document.getElementById("scoreValue").textContent = score;
 
-            // load next question
+            
             loadQuestion();
         } else {
             resultMessage.textContent = "❌ Incorrect!";

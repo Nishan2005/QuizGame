@@ -22,7 +22,6 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login()
     {
-        // If user already logged in, go straight to Home
         if (User.Identity.IsAuthenticated)
         {
             return RedirectToAction("Index", "Home");
@@ -33,7 +32,6 @@ public class AccountController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(string email, string password)
     {
-        // Find user by email
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null || user.Password != password)
@@ -54,10 +52,8 @@ public class AccountController : Controller
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
-        // Sign the user in
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-        // Redirect to home or dashboard
         return RedirectToAction("Index", "Home");
     }
 
@@ -87,7 +83,7 @@ public class AccountController : Controller
             {
                 FullName = model.FullName,
                 Email = model.SEmail,
-                Password = model.Password // Use hashing in production!
+                Password = model.Password 
             };
 
             _context.Users.Add(user);
