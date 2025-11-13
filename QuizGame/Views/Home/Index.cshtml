@@ -97,7 +97,7 @@
     // Load new question
     async function loadQuestion() {
         try {
-            const response = await fetch("https://marcconrad.com/uob/banana/api.php");
+            const response = await fetch("/Home/GetQuestion");
             const data = await response.json();
 
             document.getElementById("questionImage").src = data.question;

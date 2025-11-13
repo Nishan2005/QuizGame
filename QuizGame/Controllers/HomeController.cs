@@ -90,6 +90,18 @@ namespace QuizGame.Controllers
             }
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetQuestion()
+        {
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync("https://marcconrad.com/uob/banana/api.php");
+
+            if (!response.IsSuccessStatusCode)
+                return BadRequest("Failed to fetch question.");
+
+            var content = await response.Content.ReadAsStringAsync();
+            return Content(content, "application/json");
+        }
 
         public class AnswerModel
         {
