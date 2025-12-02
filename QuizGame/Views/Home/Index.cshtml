@@ -47,7 +47,42 @@
             background-color: #C19A6B;
         }
 
-    
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(3px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        display: none; /* Hidden by default */
+    }
+
+    .spinner {
+        width: 70px;
+        height: 70px;
+        border: 8px solid #ddd;
+        border-top: 8px solid #CFB53B; /* Your theme color */
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        from
+
+    {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+    }
 </style>
 
 <div class="top-bar shadow-sm">
@@ -84,6 +119,9 @@
 
     <div id="resultMessage" class="text-center mt-3 fw-bold"></div>
 </div>
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
 
 <script>
     let currentSolution = null;
@@ -92,6 +130,14 @@
     async function logout() {
         await fetch('/Home/Logout');
         window.location.href = '/Account/Login';
+    }
+
+    function showLoading() {
+        document.getElementById("loadingOverlay").style.display = "flex";
+    }
+
+    function hideLoading() {
+        document.getElementById("loadingOverlay").style.display = "none";
     }
 
     // Load new question
@@ -142,6 +188,7 @@
 
     // Form submission
     document.getElementById("answerForm").addEventListener("submit", function (e) {
+                showLoading();
         e.preventDefault();
 
         const userAnswer = document.getElementById("answer-input").value.trim();
@@ -156,12 +203,17 @@
             addScore();
             document.getElementById("scoreValue").textContent = score;
 
-            
-            loadQuestion();
+            setTimeout(() => {
+                loadQuestion();
+            }, 8000); // 1 second delay
+            hideLoading();
+
         } else {
             resultMessage.textContent = "❌ Incorrect!";
             resultMessage.classList.remove("text-success");
             resultMessage.classList.add("text-danger");
+            hideLoading();
+
         }
     });
 </script>
