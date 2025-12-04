@@ -188,32 +188,33 @@
 
     // Form submission
     document.getElementById("answerForm").addEventListener("submit", function (e) {
-                showLoading();
         e.preventDefault();
+        showLoading();
 
-        const userAnswer = document.getElementById("answer-input").value.trim();
-        const resultMessage = document.getElementById("resultMessage");
+        setTimeout(() => {
+            const userAnswer = document.getElementById("answer-input").value.trim();
+            const resultMessage = document.getElementById("resultMessage");
 
-        if (parseInt(userAnswer) === currentSolution) {
-            resultMessage.textContent = "✅ Correct!";
-            resultMessage.classList.remove("text-danger");
-            resultMessage.classList.add("text-success");
+            if (parseInt(userAnswer) === currentSolution) {
+                resultMessage.textContent = "✅ Correct!";
+                resultMessage.classList.remove("text-danger");
+                resultMessage.classList.add("text-success");
 
-            
-            addScore();
-            document.getElementById("scoreValue").textContent = score;
+                addScore();
 
-            setTimeout(() => {
-                loadQuestion();
-            }, 8000); // 1 second delay
-            hideLoading();
+                setTimeout(async () => {
+                    await loadQuestion();
+                    hideLoading();
+                }, 800);
 
-        } else {
-            resultMessage.textContent = "❌ Incorrect!";
-            resultMessage.classList.remove("text-success");
-            resultMessage.classList.add("text-danger");
-            hideLoading();
+            } else {
+                resultMessage.textContent = "❌ Incorrect!";
+                resultMessage.classList.remove("text-success");
+                resultMessage.classList.add("text-danger");
 
-        }
+                hideLoading();
+            }
+        }, 50); // small delay so UI renders
     });
+
 </script>
